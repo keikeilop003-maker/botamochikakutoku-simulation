@@ -80,41 +80,22 @@ function buildSystemPrompt(phaseNum) {
 
 【作戦評価】
 スコア：○○点
-ランク：○○
 ぼたもちゲージ：○○％
 
-【戦果】
-・（良かった点を1〜2点）
-
-【作戦の問題点】
-・（不足・誤りを1〜2点）
-
-【認知のズレ分析】
-・（楽観バイアス／先延ばし／受動性／空気の読み違い から1つ以上選んで説明）
-
-【模範作戦】
-・誤りの要点：
-・最適行動：
-・理由：
-
 【司令官コメント】
-・（軍隊的だが親しみやすい口調で改善への助言を1〜2文）
+・（軍隊的だが親しみやすい口調で1〜2文）
+
+【司令官からのフィードバック】
+・（児の判断ミスの問題点・認知のズレ（楽観バイアス／先延ばし／受動性／空気の読み違い）を統合して説明。2〜3点）
 
 ---
 
 ${phaseNum < 4 ? `スコアが80点未満の場合のみ追加：
 
-【再作戦提案】
-もう一度作戦を立て直すか？
-
 【改善ヒント】
 ・（具体的なヒントを1つだけ）
 
----` : ''}
-
-【ランク基準】
-90〜100点：至高の総参謀長 / 80〜89点：筆頭軍師 / 70〜79点：特級作戦参謀
-60〜69点：上級戦略官 / 50〜59点：戦術分析官 / 30〜49点：補佐員 / 0〜29点：見習い助言生`;
+---` : ''}`;
 }
 
 // ---------- API呼び出し ----------
@@ -202,8 +183,8 @@ function formatEval(text) {
     .map(s => {
       const header = s.match(/^【(.+?)】/)?.[1] || '';
       let cls = 'eval-section';
-      if (/問題点|ズレ/.test(header)) cls += ' warn';
-      if (/再作戦/.test(header)) cls += ' danger';
+      if (/フィードバック/.test(header)) cls += ' warn';
+      if (/改善ヒント/.test(header)) cls += ' danger';
       return `<div class="${cls}">${s.trim().replace(/\n/g, '<br>')}</div>`;
     })
     .join('');
@@ -244,10 +225,8 @@ function loadMission(num) {
 function showResult(score, aiText, num) {
   document.getElementById('res-mission-num').textContent = String(num).padStart(2, '0');
 
-  // ランク
-  const rank = getRank(score);
-  document.getElementById('rank-val').textContent = rank;
-  document.getElementById('rank-val').className = 'rank-val ' + (score >= 80 ? 'green' : score >= 60 ? 'amber' : '');
+  // ランクはフェーズ結果では非表示（最終画面のみ表示）
+  document.querySelector('.rank-block').style.display = 'none';
 
   // アニメーション（少し待ってから）
   setTimeout(() => {
