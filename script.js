@@ -5,7 +5,7 @@
 // ============================================================
 
 const API_KEY    = atob('QUl6YVN5Q3JTMHNuUnFNRDY4OXJkZ3Y2eklVTXY5TzM4bHNQZ1dV');
-const API_URL    = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+const API_URL    = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 const PASS_SCORE = 80;
 
 // ---------- ゲーム状態 ----------
