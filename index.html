@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>児のそら寝｜作戦参謀シミュレーション</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ========== INTRO SCREEN ========== -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-wrap">
+    <div class="classified-tag">🔒 CLASSIFIED</div>
+    <h1 class="game-title">
+      <span class="title-jp">児のそら寝</span>
+      <span class="title-sub">ぼたもち獲得作戦シミュレーション</span>
+    </h1>
+    <p class="mission-count">4 MISSIONS ／ 宇治拾遺物語</p>
+
+    <div class="brief-box">
+      <h2>🎯 ミッションブリーフィング</h2>
+      <p>舞台：<strong>比叡山延暦寺</strong></p>
+      <p>目標：<strong class="amber">ぼたもちを獲得せよ</strong></p>
+      <p class="mission-tagline">ぼたもちを手に入れるためには、どう行動すべきだったのか…？<br>児が犯した判断ミスを看破し、参謀として最適な作戦司令を提案せよ。</p>
+      <div class="role-grid">
+        <div class="role-card"><span class="role-icon">👦</span><span>児<br><small>現場実行役</small></span></div>
+        <div class="role-card"><span class="role-icon">🧠</span><span>あなた<br><small>作戦参謀</small></span></div>
+        <div class="role-card"><span class="role-icon">⚔️</span><span>AI<br><small>司令官（評価）</small></span></div>
+      </div>
+    </div>
+
+    <div class="phase-track">
+      <div class="ph active">①</div><div class="ph-line"></div>
+      <div class="ph">②</div><div class="ph-line"></div>
+      <div class="ph">③</div><div class="ph-line"></div>
+      <div class="ph">④</div>
+    </div>
+
+    <button id="btn-start" class="btn-primary">🚀 作戦開始</button>
+  </div>
+</div>
+
+<!-- ========== GAME SCREEN ========== -->
+<div id="screen-game" class="screen">
+  <div class="game-wrap">
+
+    <header class="game-header">
+      <div class="mission-badge">
+        <span class="ml">MISSION</span>
+        <span class="mn" id="mission-num">01</span>
+      </div>
+      <div class="header-score">
+        <span>累積スコア</span>
+        <span id="total-score" class="amber">0</span>
+      </div>
+      <div class="phase-mini" id="phase-mini">
+        <span class="pm" data-p="1">①</span>
+        <span class="pm" data-p="2">②</span>
+        <span class="pm" data-p="3">③</span>
+        <span class="pm" data-p="4">④</span>
+      </div>
+    </header>
+
+    <!-- 古文テキスト -->
+    <section class="card border-amber">
+      <div class="card-label amber">📜 古文</div>
+      <div id="orig-text" class="orig-text"></div>
+      <details>
+        <summary>📖 現代語訳を見る</summary>
+        <div id="mod-text" class="mod-text"></div>
+      </details>
+    </section>
+
+    <!-- 入力フォーム -->
+    <section class="card">
+      <div class="card-label green" id="phase-title"></div>
+      <div class="input-heading">❌ 児の判断ミス</div>
+      <label class="field-label">児が判断を誤った行動を指摘してください。</label>
+      <textarea id="inp-mistake" rows="3" placeholder="（原文の内容を現代語で書く）"></textarea>
+      <div class="input-heading">✅ 作戦司令</div>
+      <label class="field-label">児が取るべきだった行動を提案してください。</label>
+      <textarea id="inp-action" rows="3" placeholder="（具体的な行動を書く）"></textarea>
+      <button id="btn-submit" class="btn-primary">⚔️ 作戦提出</button>
+    </section>
+
+  </div>
+</div>
+
+<!-- ========== RESULT SCREEN ========== -->
+<div id="screen-result" class="screen">
+  <div class="result-wrap">
+
+    <header class="result-header">
+      <div class="mission-badge">
+        <span class="ml">MISSION</span>
+        <span class="mn" id="res-mission-num">01</span>
+      </div>
+      <h2 class="green">【作戦評価】</h2>
+    </header>
+
+    <!-- スコアサークル -->
+    <div class="score-row">
+      <div class="score-circle-wrap">
+        <svg viewBox="0 0 120 120" class="score-svg">
+          <circle class="sc-bg" cx="60" cy="60" r="54"/>
+          <circle class="sc-fill" cx="60" cy="60" r="54" id="sc-fill"/>
+        </svg>
+        <div class="score-inner">
+          <span id="score-num" class="score-num">0</span>
+          <span class="score-unit">点</span>
+        </div>
+      </div>
+      <div class="rank-block">
+        <div class="rl">ランク</div>
+        <div id="rank-val" class="rank-val amber"></div>
+      </div>
+    </div>
+
+    <!-- ぼたもちゲージ -->
+    <div class="card gauge-card">
+      <div class="gauge-head">
+        <span>🍡 ぼたもちゲージ</span>
+        <span id="gauge-pct" class="gauge-pct green">0%</span>
+      </div>
+      <div class="gauge-bar">
+        <div id="gauge-fill" class="gauge-fill"></div>
+        <div class="gauge-line">
+          <span class="gauge-line-label">80%</span>
+        </div>
+      </div>
+      <div id="gauge-status" class="gauge-status"></div>
+    </div>
+
+    <!-- AI評価テキスト -->
+    <div class="card eval-card">
+      <div id="eval-content" class="eval-content"></div>
+    </div>
+
+    <!-- ボタン -->
+    <div class="action-row">
+      <button id="btn-next" class="btn-primary" style="display:none">➡️ 次のミッションへ</button>
+      <button id="btn-retry" class="btn-secondary" style="display:none">🔄 再作戦</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== FINAL SCREEN ========== -->
+<div id="screen-final" class="screen">
+  <div class="final-wrap">
+    <div class="classified-tag">🏆 MISSION COMPLETE</div>
+    <h1 class="green final-title">作戦終了報告</h1>
+
+    <div class="final-score-row">
+      <span id="final-total" class="final-total amber">0</span>
+      <span class="final-denom">/ 400点</span>
+    </div>
+    <div id="final-rank" class="final-rank green"></div>
+
+    <div class="card gauge-card">
+      <div class="gauge-head">
+        <span>🍡 総合ぼたもちゲージ</span>
+        <span id="final-pct" class="gauge-pct green">0%</span>
+      </div>
+      <div class="gauge-bar large">
+        <div id="final-gauge-fill" class="gauge-fill"></div>
+        <div class="gauge-line"><span class="gauge-line-label">80%</span></div>
+      </div>
+    </div>
+
+    <div id="mission-scores" class="mission-scores"></div>
+
+    <div class="rank-table">
+      <div class="rank-row"><span class="rank-score">90〜100</span><span class="rank-name">至高の総参謀長</span></div>
+      <div class="rank-row"><span class="rank-score">80〜89</span><span class="rank-name">筆頭軍師</span></div>
+      <div class="rank-row"><span class="rank-score">70〜79</span><span class="rank-name">特級作戦参謀</span></div>
+      <div class="rank-row"><span class="rank-score">60〜69</span><span class="rank-name">上級戦略官</span></div>
+      <div class="rank-row"><span class="rank-score">50〜59</span><span class="rank-name">戦術分析官</span></div>
+      <div class="rank-row"><span class="rank-score">30〜49</span><span class="rank-name">補佐員</span></div>
+      <div class="rank-row"><span class="rank-score">0〜29</span><span class="rank-name">見習い助言生</span></div>
+    </div>
+
+    <button id="btn-restart" class="btn-primary">🔄 最初からやり直す</button>
+  </div>
+</div>
+
+<!-- ========== LOADING ========== -->
+<div id="loading" class="loading-overlay" style="display:none">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p class="green">司令官が評価中...</p>
+    <div class="dots"><span>.</span><span>.</span><span>.</span></div>
+  </div>
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>
