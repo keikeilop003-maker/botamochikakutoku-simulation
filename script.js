@@ -4,9 +4,8 @@
 //  APIキーはlocalStorageのみに保存（ソースコードには含めない）
 // ============================================================
 
-const API_KEY    = atob('c2stcHJvai1iTjFwejI0ZWxOOXVOT2ZTUjVoNXU4Q1lTTHNkOU9NSkNuYU94d2ZpRW5LTVctS2xtamFWRVVwV0YzbU1VdXVwSXZuOGxmWlpjMlQzQmxia0ZKM3IzOG1QV3ZJRkRsa3VJTlVmZkNwTTNRRTBhMHFnb2pLck1xamVpTmx4WmJHWjBMQUxteG1Fa2x0STQ0eG14bzVLQS1CX0k4SUE=');
-const API_URL    = 'https://api.openai.com/v1/chat/completions';
-const MODEL      = 'gpt-4o-mini';
+const API_KEY    = atob('QUl6YVN5Q3JTMHNuUnFNRDY4OXJkZ3Y2eklVTXY5TzM4bHNQZ1dV');
+const API_URL    = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 const PASS_SCORE = 80;
 
 // ---------- ゲーム状態 ----------
@@ -120,27 +119,18 @@ ${phaseNum < 4 ? `スコアが80点未満の場合のみ追加：
 
 // ---------- API呼び出し ----------
 async function callAPI(phaseNum, mistake, action) {
-  const key = API_KEY;
-
   const userMsg =
     `【フェーズ${phaseNum}の作戦報告】\n\n` +
     `■ 児の誤った判断の指摘：\n${mistake}\n\n` +
-    `■ 取るべきだった代替行動とその理由：\n${action}`;
+    `■ 取るべきだった代替行動：\n${action}`;
 
   const res = await fetch(API_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${key}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: buildSystemPrompt(phaseNum) },
-        { role: 'user',   content: userMsg },
-      ],
-      temperature: 0.7,
-      max_tokens: 1600,
+      systemInstruction: { parts: [{ text: buildSystemPrompt(phaseNum) }] },
+      contents: [{ role: 'user', parts: [{ text: userMsg }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 1600 },
     }),
   });
 
@@ -150,7 +140,7 @@ async function callAPI(phaseNum, mistake, action) {
   }
 
   const data = await res.json();
-  return data.choices[0].message.content;
+  return data.candidates[0].content.parts[0].text;
 }
 
 // ---------- ユーティリティ ----------
